@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Heroes Lite</title>
+<style>
+  :root{--gold:#e8c46a;--bg:#1a120b;--panel:#2a1d12;--panel2:#36260f;--txt:#f0e2c4;--accent:#d98b3a;--good:#5fb56a;--bad:#d65a5a;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--txt);
+    font-family:Georgia,"Times New Roman",serif;overflow:hidden;overscroll-behavior:none;touch-action:none;user-select:none;}
+  #app{position:fixed;inset:0;display:flex;flex-direction:column;}
+  #topbar{display:flex;align-items:center;gap:4px;padding:5px 8px;background:linear-gradient(#3a2812,#241608);
+    border-bottom:3px solid #000;min-height:40px;flex-wrap:wrap;}
+  .res{display:flex;align-items:center;gap:2px;background:var(--panel2);padding:3px 6px;border-radius:10px;font-size:12px;font-weight:700;font-family:system-ui;}
+  .res span{min-width:10px;text-align:right;}
+  #turnInfo{margin-left:auto;font-size:12px;line-height:1.15;text-align:right;font-family:system-ui;}
+  #mapWrap{flex:1;position:relative;overflow:hidden;background:#000;}
+  #mapCanvas{display:block;position:absolute;inset:0;touch-action:none;}
+  #actionbar{display:flex;gap:8px;padding:8px;background:linear-gradient(#241608,#1a1006);border-top:3px solid #000;}
+  button{font-family:inherit;font-size:15px;font-weight:700;color:var(--txt);
+    background:linear-gradient(#6a4a22,#3e2a12);border:2px solid #1c120a;border-radius:8px;padding:12px 14px;cursor:pointer;}
+  button:active{transform:translateY(1px);}button:disabled{opacity:.4;}
+  button.primary{background:linear-gradient(#8a6a24,#5a4010);color:#fff;}
+  button.danger{background:linear-gradient(#8a3022,#4a1d12);}
+  .small{flex:0 0 auto;padding:12px 14px;}
+  .overlay{position:fixed;inset:0;background:rgba(8,5,2,.86);display:none;z-index:50;padding:16px;overflow:auto;}
+  .overlay.show{display:flex;flex-direction:column;}
+  .card{background:var(--panel);border:3px solid #000;border-image:linear-gradient(#8a6a24,#3a2812)1;border-radius:14px;padding:18px;margin:auto;max-width:480px;width:100%;}
+  .card h1{margin:0 0 4px;color:var(--gold);text-align:center;font-size:30px;text-shadow:2px 2px 0 #000;}
+  .card h3{margin:14px 0 8px;color:var(--accent);font-size:17px;border-bottom:1px solid #5a4010;padding-bottom:4px;}
+  .card p{font-size:14px;line-height:1.5;margin:8px 0;font-family:system-ui;}
+  .btnrow{display:flex;gap:8px;margin-top:14px;}
+  .btnrow button{flex:1;}
+
+  /* MENU GŁÓWNE — styl HoMM3 */
+  #menu{align-items:center;justify-content:center;}
+  #menu .menubox{background:linear-gradient(#3a2812,#24140a);border:4px solid var(--gold);border-radius:18px;padding:30px 26px;width:min(420px,92%);text-align:center;box-shadow:0 0 40px rgba(0,0,0,.6);}
+  #menu h1{font-size:38px;color:var(--gold);margin:0;text-shadow:3px 3px 0 #000;letter-spacing:1px;}
+  #menu .sub{color:#cbb;font-size:13px;margin:4px 0 22px;font-family:system-ui;}
+  .menubtn{display:block;width:100%;margin:8px 0;padding:16px;font-size:18px;background:linear-gradient(#6a4a22,#3e2a12);border:2px solid var(--gold);border-radius:10px;}
+  .menubtn:active{transform:scale(.98);}
+  .menubtn b{color:var(--gold);}
+  .menubtn small{display:block;font-size:12px;opacity:.8;font-weight:400;}
+
+  /* SETUP (nowa gra) */
+  .facGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0;}
+  .faccard{background:var(--panel2);border:2px solid #000;border-radius:10px;padding:12px 6px;text-align:center;cursor:pointer;font-size:13px;font-family:system-ui;}
+  .faccard .facemo{font-size:30px;}
+  .faccard.selected{border-color:var(--gold);background:linear-gradient(#5a4010,#3a2812);}
+  .sizeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0;}
+  .sizecard{background:var(--panel2);border:2px solid #000;border-radius:10px;padding:10px 4px;text-align:center;cursor:pointer;font-family:system-ui;font-size:13px;}
+  .sizecard.selected{border-color:var(--gold);background:linear-gradient(#5a4010,#3a2812);}
+  .aiSel{display:flex;align-items:center;justify-content:center;gap:16px;margin:14px 0;font-family:system-ui;}
+  .aiSel button{width:48px;height:48px;font-size:24px;padding:0;}
+
+  /* MIASTO */
+  #town{padding:0;}
+  #town .card{max-width:560px;border-radius:0;margin:0;max-height:100%;border:none;border-radius:0;}
+  .townHead{display:flex;align-items:center;gap:12px;padding-bottom:10px;border-bottom:2px solid #5a4010;}
+  .townEmoji{font-size:40px;} .townHead h1{margin:0;font-size:22px;text-align:left;}
+  .townOwner{font-size:12px;font-family:system-ui;} .townHead button{margin-left:auto;flex:0 0 auto;width:44px;height:44px;padding:0;}
+  .buildGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;}
+  .buildBtn{padding:8px;font-size:12px;text-align:left;line-height:1.3;background:linear-gradient(#4a3416,#2e1f0e);}
+  .buildBtn small{display:block;color:var(--gold);}
+  .recruitList .recItem{display:flex;align-items:center;gap:8px;padding:7px;background:var(--panel2);border-radius:8px;margin:4px 0;}
+  .recEmo{font-size:26px;width:32px;text-align:center;}
+  .recInfo{flex:1;font-size:12px;line-height:1.25;font-family:system-ui;}
+  .recBtns{display:flex;gap:4px;}.recBtns button{padding:8px 10px;font-size:12px;}
+  .armies{display:flex;gap:8px;}.armyCol{flex:1;background:var(--panel2);border-radius:8px;padding:6px;}
+  .armyCol h4{margin:0 0 6px;text-align:center;font-size:13px;color:var(--accent);}
+  .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;}
+  .slot{background:var(--bg);border:1px solid #5a4010;border-radius:6px;padding:6px 2px;text-align:center;font-size:22px;min-height:48px;cursor:pointer;}
+  .slot span{display:block;font-size:12px;font-family:system-ui;}
+  .slot.empty{opacity:.3;}.hint{font-size:11px;opacity:.7;font-family:system-ui;text-align:center;}
+
+  /* WALKA */
+  #combatLayer{position:fixed;inset:0;background:#1a1610;z-index:40;display:none;flex-direction:column;}
+  #combatLayer.show{display:flex;}
+  #combatInfo{padding:6px 10px;background:linear-gradient(#3a2812,#24140a);border-bottom:2px solid #000;text-align:center;font-family:system-ui;font-size:13px;}
+  .ci-row{font-size:14px;}.ci-cur{color:var(--gold);font-weight:700;margin:2px 0;}.ci-log{opacity:.8;font-size:12px;}
+  #combatCanvasWrap{flex:1;position:relative;}
+  #combatCanvas{position:absolute;inset:0;touch-action:none;}
+  #combatBar{display:flex;gap:6px;padding:8px;background:linear-gradient(#24140a,#1a1006);border-top:2px solid #000;}
+  #combatBar button{flex:1;font-size:14px;padding:12px 6px;}
+
+  /* HOT-SEAT PASS */
+  #pass .card{text-align:center;}#passName{font-size:36px;color:var(--gold);margin:8px 0;}
+  #passFac{font-size:18px;margin-bottom:12px;}
+
+  /* LOBBY */
+  .lobbyPlayer{padding:8px;background:var(--panel2);border-radius:8px;margin:4px 0;font-family:system-ui;}
+  .lobbyPlayer.me{border-left:4px solid var(--gold);}
+
+  #waitOverlay{position:fixed;inset:0;background:rgba(8,5,2,.92);z-index:45;display:none;align-items:center;justify-content:center;flex-direction:column;}
+  #waitOverlay.show{display:flex;}#waitText{font-size:20px;color:var(--gold);font-weight:700;}
+
+  #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#000;color:var(--gold);
+    padding:10px 18px;border-radius:20px;font-size:14px;font-weight:700;z-index:90;opacity:0;transition:opacity .3s;
+    pointer-events:none;border:1px solid var(--accent);max-width:90%;text-align:center;}
+  #toast.show{opacity:1;}
+
+  /* TARG */
+  .marketGrid{margin:8px 0;}
+  .marketRow{display:flex;align-items:center;gap:8px;padding:8px;background:var(--panel2);border-radius:8px;margin:4px 0;font-family:system-ui;}
+  .marketFrom{min-width:80px;font-size:14px;font-weight:700;}
+  .marketArrows{display:flex;flex-wrap:wrap;gap:4px;flex:1;}
+  .tradeBtn{width:42px;height:42px;padding:0;font-size:20px;flex:0 0 auto;}
+
+  /* KARCZMA */
+  .hireRow{display:flex;align-items:center;gap:10px;background:var(--panel2);border-radius:8px;padding:10px;}
+  .hireInfo{flex:1;font-size:13px;font-family:system-ui;}
+  .hireInfo small{opacity:.7;}
+  .hireRow button{flex:0 0 auto;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar"><div id="resBar"></div><div id="turnInfo"></div></div>
+  <div id="mapWrap"><canvas id="mapCanvas"></canvas></div>
+  <div id="actionbar">
+    <button class="primary" id="btnEnd">⏭️ Tura</button>
+    <button class="small" id="btnNextHero">🧙⏭</button>
+    <button class="small" id="btnSave">💾</button>
+    <button class="small" id="btnHelp">❔</button>
+  </div>
+</div>
+
+<!-- MENU GŁÓWNE -->
+<div id="menu" class="overlay show">
+  <div class="menubox">
+    <h1>HEROES</h1>
+    <h1 style="font-size:24px;margin-top:-6px;">Might &amp; Magic <small style="font-size:14px;">lite</small></h1>
+    <div class="sub">Lekka gra strategiczna · na telefon · na kibla 😎</div>
+    <button class="menubtn" id="mNewGame"><b>⚔️ NOWA GRA</b><small>Samotna kampania przeciw komputerowi</small></button>
+    <button class="menubtn" id="mHotseat"><b>📱 HOT-SEAT</b><small>2 graczy na 1 telefonie</small></button>
+    <button class="menubtn" id="mMulti"><b>🌐 MULTIPLAYER</b><small>Przez WiFi (serwer na PC)</small></button>
+    <button class="menubtn" id="mHelp" style="font-size:16px;">❔ Jak grać</button>
+    <button class="menubtn" id="mSave" style="font-size:16px;">💾 Zapisz grę</button>
+    <button class="menubtn" id="mLoad" style="font-size:16px;display:none;">📂 Wczytaj grę</button>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div id="setup" class="overlay">
+  <div class="card">
+    <h1 id="setupTitle" style="font-size:24px;">Nowa gra</h1>
+    <h3>Frakcja</h3><div class="facGrid" id="facGrid"></div>
+    <h3>Rozmiar mapy</h3><div class="sizeGrid" id="sizeGrid"></div>
+    <h3>Liczba przeciwników (komputer)</h3>
+    <div class="aiSel"><button id="aiMinus">−</button><span id="aiCount" style="font-size:22px;color:var(--gold);">1</span><button id="aiPlus">+</button></div>
+    <div class="btnrow"><button id="setupBack">↩ Wstecz</button><button class="primary" id="setupStart">▶️ Start</button></div>
+  </div>
+</div>
+
+<!-- LOBBY -->
+<div id="lobby" class="overlay">
+  <div class="card">
+    <h1 style="font-size:24px;">🏰 Lobby</h1>
+    <p id="lobbyStatus" style="text-align:center;">Łączenie…</p>
+    <h3>Gracze</h3><div id="lobbyList"></div>
+    <div class="btnrow"><button id="btnLobbyLeave">↩ Wróć</button><button class="primary" id="btnLobbyStart">▶️ Start (min. 2)</button></div>
+  </div>
+</div>
+
+<!-- PASS (hot-seat) -->
+<div id="pass" class="overlay">
+  <div class="card">
+    <h1 style="font-size:22px;">Podaj telefon 📱</h1>
+    <p>Teraz tura gracza:</p>
+    <div id="passName">—</div>
+    <div id="passFac"></div>
+    <div class="btnrow"><button class="primary" id="btnPassGo">Pokaż mapę</button></div>
+  </div>
+</div>
+
+<!-- MIASTO -->
+<div id="town" class="overlay"><div class="card"><div id="townBody"></div></div></div>
+
+<!-- WALKA -->
+<div id="combatLayer">
+  <div id="combatInfo"></div>
+  <div id="combatCanvasWrap"><canvas id="combatCanvas"></canvas></div>
+  <div id="combatBar">
+    <button id="btnWait">⏳ Czekaj</button>
+    <button id="btnDefend">🛡️ Obrona</button>
+    <button id="btnAuto">⚡ Auto</button>
+    <button class="danger" id="btnFlee">🏃 Ucieczka</button>
+  </div>
+</div>
+
+<!-- WAIT (mp) -->
+<div id="waitOverlay"><div id="waitText"></div><div style="margin-top:10px;opacity:.7;">Czekaj na ruch przeciwnika…</div></div>
+
+<!-- WINNER -->
+<div id="winner" class="overlay">
+  <div class="card" style="text-align:center;">
+    <h1 id="winnerText" style="font-size:26px;">🏆</h1>
+    <div class="btnrow"><button class="primary" id="btnAgain">↩ Menu</button></div>
+  </div>
+</div>
+
+<!-- HELP -->
+<div id="help" class="overlay">
+  <div class="card">
+    <h1 style="font-size:24px;">❔ Jak grać</h1>
+    <h3>Mapa przygody</h3>
+    <p>• <b>Stuknij bohatera</b> by go wybrać, potem <b>stuknij kafelek</b> — bohater tam pójdzie (szukana ścieżka).<br>
+       • Białe pola = gdzie dojdziesz. <b>Przeciągnij palcem</b> by przesunąć widok.<br>
+       • Zbieraj <b>surowce 💰🪵🪨💎</b>, zdobywaj <b>kopalnie ⛏️</b>, walcz z <b>potworami 👹</b>.<br>
+       • Wejdź na <b>własne miasto 🏰</b> by budować i rekrutować wojsko.<br>
+       • Mgła: <b>czarne</b>=nieodkryte, <b>ciemne</b>=odkryte ale nie widać, <b>jaskrawe</b>=widoczne.</p>
+    <h3>Miasto</h3>
+    <p>• <b>1 budowla dziennie</b> — ulepsz ratusz (dochód), buduj fortecę i siedliska jednostek.<br>
+       • Rekrutuj jednostki do garnizonu, potem przenieś do bohatera (stuknij stos).</p>
+    <h3>Walka (heksy)</h3>
+    <p>• Stuknij swoją jednostkę (żółty pierścień), potem stuknij <b>cel</b> (atak) lub <b>pole</b> (ruch).<br>
+       • <b>Strzelcy 🏹</b> biją z dystansu (kara za duży dystans). Latające 🦅 omijają jednostki.<br>
+       • Jednostki ruszają wg <b>szybkości</b>. Po ataku wróg <b>odwzajemnia</b> cios (raz na rundę).<br>
+       • <b>Obrona</b>=+obrona, <b>Czekaj</b>=przejdź na koniec kolejki, <b>Auto</b>=komputer rozegra resztę.</p>
+    <h3>Cel gry</h3>
+    <p>Pokonaj wszystkich przeciwników — odbierz im miasta i bohaterów.</p>
+    <div class="btnrow"><button class="primary" id="btnHelpClose">Zrozumiałem</button></div>
+  </div>
+</div>
+
+<!-- DAY POPUP -->
+<div id="dayPopup" class="overlay">
+  <div class="card" style="text-align:center;">
+    <h1 id="dayPopupTitle" style="font-size:32px;">Dzień 1</h1>
+    <p id="dayPopupSub" style="font-size:16px;color:var(--accent);">Tydzień 1</p>
+    <p id="dayPopupPlayer" style="font-size:18px;font-weight:700;">—</p>
+    <div class="btnrow"><button class="primary" id="btnDayOk">Dalej</button></div>
+  </div>
+</div>
+
+<!-- TARG -->
+<div id="market" class="overlay">
+  <div class="card"><div id="marketBody"></div></div>
+</div>
+
+<div id="toast"></div>
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="render.js"></script>
+</body>
+</html>
