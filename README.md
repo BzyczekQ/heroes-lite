@@ -1,65 +1,82 @@
-# ⚔️ Heroes Lite — Might & Magic
+# ⚔️ Heroes Lite
 
-Lekka gra strategiczna w stylu **Heroes of Might & Magic III**, napisana w czystym HTML5 + JavaScript. Działa w przeglądarce telefonu, nic nie trzeba instalować. Idealna do pogrania „na kibla". 😎
+Lekka gra strategiczna w stylu **Heroes of Might and Magic 3**, napisana w czystym
+HTML5 + JavaScript. Działa w przeglądarce telefonu (Android/iPhone), nic nie trzeba
+instalować na telefonie. Idealna do pogrania np. „na kibla”. 😎
 
----
+## Co potrafi
 
-## 📜 Historia Wersji i Ewolucja Projektu
+- 🗺️ **Mapa** z terenem (las, woda, góry, drogi), którą przesuwasz palcem.
+- 🧙 **Bohater** z punktami ruchu — stukasz kafelek, bohater idzie (znajduje ścieżkę).
+- 🏰 **Miasta** — rekrutujesz wojsko (5 typów jednostek), przerzucasz je między garnizonem a bohaterem.
+- ⛏️ **Kopalnie** (złoto, drewno, ruda, klejnoty), 💰 skarby, 👹 potwory do pokonania.
+- ⚔️ **Walka taktyczna** na planszy — jednostki ruszają się wg szybkości, strzelcy biją z dystansu, latające przelatują, po ataku wróg **odwzajemnia** cios.
+- 📱 **Hot-seat** — gracze podają sobie jeden telefon na zmianę (ekran „podaj telefon”).
+- 🌐 **Multiplayer po WiFi** — serwer na komputerze, telefony łączą się przez przeglądarkę (2–4 graczy).
+- 🏆 Cel: pokonać bohatera przeciwnika LUB zdobyć jego miasto.
 
-* **📦 Wersja v0.1 – Prototyp Alfa:** Pierwsza próba przeniesienia mechanik gry na silnik przeglądarkowy. Zawierała podstawowy interfejs tekstowo-graficzny oraz system wyboru mapy. Walka w tej wersji nie działała ani pod względem wizualnym, ani logiki kodu – służyła jako fundament pod dalszy rozwój.
+## Wymagania
 
-* **📦 Wersja v0.2 – 2D Emoji Engine:** Przełomowa, grywalna wersja. Zamiast skomplikowanych grafik zastosowano minimalistyczną i humorystyczną oprawę opartą o ikony i emotikony (Emoji). Zamiast osobnego widoku zamku wprowadzono czytelny panel tekstowy z opcjami rekrutacji i ulepszania. Naprawiono logikę walki.
-
-* **📦 Wersja v0.3 – Rzut Izometryczny (Pseudo-3D):** Najnowsza odsłona wprowadzająca perspektywę izometryczną na mapie przygody, co znacznie poprawia czytelność i wygląd planszy, zachowując przy tym lekkość i szybkość działania.
-
----
-
-## Co ma (wierniejsze HoMM3 niż v1)
-
-- 🏰 **3 frakcje** (Zamek / Loch / Nekropolia), każda z **7 poziomami jednostek**.
-- 🧙 **Wielu bohaterów** — zatrudniaj ich w **karczmie** w mieście (do 8), przełączaj przyciskiem 🧙⏭.
-- 🗺️ **Mapa przygody** w 3 rozmiarach (Mała/Średnia/Duża) z **mgłą wojny**.
-- 🪙 **7 surowców** + **targ** (⚖️) do wymiany surowców.
-- 🏗️ **Budowle w mieście** — ratusz, forteca, siedliska. **1 budowla dziennie**.
-- 🏚️ **Nowe obiekty mapy**: obserwatoria (🗼 odkrywają teren), świątynie (⛩️ dają XP), flagowane siedliska (dają tygodniowe jednostki), artefakty, kopalnie, skarby.
-- ⚔️ **Walka na heksach** (15×11) — ruch wg szybkości, strzelcy, latające, odwzajemnienie, obrona, czekanie, **czary bojowe**. **Pinch-zoom + przesuwanie**.
-- 🤖 **Przeciwnicy komputerowi** (AI na mapie i w walce).
-- 💾 **Zapis/wczytanie** gry (przycisk 💾 + „Wczytaj" w menu).
-- 📱 **Hot-seat** (2 graczy na 1 telefonie) i **🌐 Multiplayer po WiFi**.
-- 🎯 Cel: odebrać przeciwnikom miasta i bohaterów.
+- **Hot-seat:** tylko przeglądarka w telefonie.
+- **Multiplayer:** komputer z **Node.js** (do uruchomienia serwera) + telefony w tej samej sieci WiFi.
 
 ---
 
-## ▶️ Jak uruchomić
+## ▶️ Jak grać — HOT-SEAT (na 1 telefonie, najprościej)
 
-**Najszybciej — Hot-seat / gra z komputerem na 1 telefonie:**
-1. Skopiuj folder na telefon i otwórz `index.html` w przeglądarce.  
-   *(jeśli przeglądarka blokuje skrypty z pliku — użyj sposobu multiplayer poniżej)*
+1. Skopiuj cały folder `heroes-lite` na telefon (przez kabel / Dysk Google / cokolwiek).
+2. Otwórz plik **`index.html`** w przeglądarce telefonu.
+3. Wybierz **„📱 Hot-seat (2 graczy)"**.
+4. Gracze podają sobie telefon na zmianę. Koniec tury → ekran „podaj telefon".
 
-**Multiplayer / przez serwer (polecane):**
-1. Na komputerze w tym samym WiFi: `node server.js`
-2. Konsola pokaże adres, np. `http://192.168.1.20:8080`
-3. Na telefonach wejdź na ten adres w przeglądarce.
+> Jeśli telefon blokuje otwieranie skryptów z pliku, użyj zamiast tego sposobu „multiplayer" poniżej (uruchom serwer na PC i wejdź na niego z telefonu — działa też dla hot-seata na jednym telefonie).
+
+---
+
+## ▶️ Jak grać — MULTIPLAYER po WiFi
+
+1. Na **komputerze** (w tym samym WiFi co telefony) wejdź do folderu `heroes-lite` i uruchom:
+   ```
+   node server.js
+   ```
+2. W konsoli pojawi się adres, np.:
+   ```
+   Telefony w tej samej WiFi: http://192.168.1.20:8080
+   ```
+3. Na **każdym telefonie** otwórz w przeglądarce ten adres.
+4. Każdy gracz wpisuje imię i klika **„🌐 Połącz i graj"**.
+5. Gdy wszyscy (min. 2) będą w lobby, pierwszy gracz klika **„▶️ Start"**.
+6. Gramy! Tura przechodzi między telefonami — gdy nie Twoja kolej, widzisz ekran czekania.
 
 ---
 
 ## 🎮 Sterowanie
 
-* **Mapa:** stuknij bohatera → stuknij cel (droga szukana automatycznie). Przeciągnij = przesuń widok.
-* **Walka:** stuknij jednostkę (żółty pierścień) → stuknij cel/pole. Szczypnij = zoom, przeciągnij = przesuń.
-* **Menu:** Nowa Gra → wybierz frakcję, rozmiar mapy i liczbę przeciwników.
+**Mapa**
+- **Stuknij kafelek** obok bohatera → bohater tam pójdzie.
+- Stuknij **skarb / surowce / kopalnię / potwora** → zbierzesz / zdobędziesz / stoczysz walkę.
+- Wejdź na **swoje miasto** (lub w nie stuknij) → ekran miasta i rekrutacja.
+- **Przeciągnij palcem** → przesuwasz widok.
+- **⏭️ Koniec tury** → przekazujesz kolejkę.
 
----
+**Walka**
+- Stuknij swoją jednostkę (podświetloną), potem stuknij **cel** (wróg) lub **pole** (ruch).
+- Strzelcy 🏹 biją z dystansu. Latające 🦅 omijają jednostki.
+- **🏃 Ucieczka** — wycofujesz się z ocalałymi (bohater zostaje żywy).
 
-## 📁 Pliki
+## 🧱 Co dalej (możliwe rozszerzenia)
 
-| Plik | Co zawiera |
-|------|-----------|
-| `index.html` | interfejs + menu (styl HoMM3) |
-| `data.js` | frakcje, jednostki, surowce, czary |
-| `engine.js` | logika gry (mapa, heksy, walka, ekonomia) — testowalna w Node |
-| `render.js` | render Canvas + sterowanie + sieć |
-| `server.js` | serwer multiplayer (sam Node, zero zależności) |
-| `test.js`, `test_combat.js` | testy logiki (`node test.js`) |
+Gra jest celowo „lekka", ale łatwo ją rozbudować:
+- więcej frakcji / jednostek (edytuj tabelę `UNITS` w `game.js`),
+- magia i zaklęcia,
+- więcej bohaterów u jednego gracza,
+- zapis/load stanu (stan to zwykły obiekt JSON — wystarczy zapisać do pliku).
+
+## 📂 Pliki
+
+- `index.html` — interfejs (HTML + CSS).
+- `game.js` — cała logika gry, render i sieć.
+- `server.js` — serwer multiplayer (zero zależności, sam Node).
+- `test.js` / `test2.js` — testy logiki (`node test.js`).
 
 Miłej gry! 🏰
