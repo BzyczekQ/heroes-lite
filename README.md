@@ -14,7 +14,7 @@ Lekka gra strategiczna w stylu **Heroes of Might & Magic III**, napisana w czyst
 
 ---
 
-## Co ma (wierniejsze HoMM3 niż v1)
+## Co ma
 
 - 🏰 **3 frakcje** (Zamek / Loch / Nekropolia), każda z **7 poziomami jednostek**.
 - 🧙 **Wielu bohaterów** — zatrudniaj ich w **karczmie** w mieście (do 8), przełączaj przyciskiem 🧙⏭.
